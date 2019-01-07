@@ -7,20 +7,13 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.team364.robot.autons.*;
 import frc.team364.robot.subsystems.*;
 
 public class Robot extends TimedRobot {
 
     public static DriveSystem driveSystem;
-    public String gameData = "";
 
     public static OI oi;
-
-    public static Command leftAutonSwitch;
-    public static Command rightAutonSwitch;
-    public static Command farAutonScale;
-    public static Command closeAutonScale;
 
     public UsbCamera camera;
 
@@ -36,11 +29,6 @@ public class Robot extends TimedRobot {
         setPeriod(0.02);
 	    driveSystem = new DriveSystem();
 	    oi = new OI();
-	    leftAutonSwitch = new RightSwitchRedStick();
-        rightAutonSwitch = new RightSwitchRedStick();
-        farAutonScale = new RightSwitchRedStick();
-        closeAutonScale = new RightSwitchRedStick();
-        //flippyShit = new FlippyShit();
         camera = CameraServer.getInstance().startAutomaticCapture("Video", 0);
         camera.setResolution(320, 240);
         driveSystem.resetEncoders();
@@ -53,20 +41,6 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         Scheduler.getInstance().removeAll();
-	    gameData = DriverStation.getInstance().getGameSpecificMessage();
-        if(oi.autoSelectorButton.get()) {
-            if(gameData.charAt(1) == 'L') {
-                farAutonScale.start();
-            } else {
-                closeAutonScale.start();
-            }
-        } else {
-            if(gameData.charAt(0) == 'L') {
-                leftAutonSwitch.start();
-            } else {
-                rightAutonSwitch.start();
-            }
-        }
         driveSystem.resetHeading();
         driveSystem.resetEncoders();
     }
@@ -107,7 +81,5 @@ public class Robot extends TimedRobot {
 
     private void putSmartDashVars() {
         SmartDashboard.putNumber("Gyro Angle", driveSystem.getGyroAngle());
-        SmartDashboard.putNumber("Left Encoder Counts", driveSystem.getLeftEncoderPosition());
-        SmartDashboard.putNumber("Right Encoder Counts", driveSystem.getRightEncoderPosition());
     }
 }
