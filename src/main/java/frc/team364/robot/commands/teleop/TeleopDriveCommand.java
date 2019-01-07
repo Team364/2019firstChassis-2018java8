@@ -21,7 +21,7 @@ public class TeleopDriveCommand extends Command {
     public boolean forward;
     public double leftVelocity;
     public double rightVelocity;
-    static enum DriveStates {STATE_NOT_MOVING, STATE_DIRECT_DRIVE, STATE_RAMP_DOWN}
+    static enum DriveStates {STATE_NOT_MOVING, STATE_DIRECT_DRIVE, STATE_RAMP_DOWN, STATE_DRIVE_STRAIGHT}
     public DriveStates driveState;
     public double tankLeft;
     public double tankRight;
@@ -64,7 +64,11 @@ public class TeleopDriveCommand extends Command {
         if (driveState == DriveStates.STATE_NOT_MOVING) {
             tankLeft = 0;
             tankRight = 0;
-            if ((Math.abs(leftControllerInput) >= 0.25) || (Math.abs(rightControllerInput) >= 0.25)) {
+            
+            if(Robot.oi.driverController.getRawButton(10)){
+                System.out.println("STATE_NOT_MOVING->STATE_DRIVE_STRAIGHT");
+                driveState = DriveStates.STATE_DRIVE_STRAIGHT;
+            } else if ((Math.abs(leftControllerInput) >= 0.25) || (Math.abs(rightControllerInput) >= 0.25)) {
                 System.out.println("STATE_NOT_MOVING->STATE_DIRECT_DRIVE");
                 driveState = DriveStates.STATE_DIRECT_DRIVE;
             }
@@ -85,6 +89,15 @@ public class TeleopDriveCommand extends Command {
             } else if (Robot.driveSystem.leftRear.getMotorOutputPercent() <= 0.1) {
                 driveState = DriveStates.STATE_NOT_MOVING;
                 System.out.println("STATE_RAMP_DOWN->STATE_NOT_MOVING");
+            }
+            
+        }
+        else if (driveState == DriveStates.STATE_DRIVE_STRAIGHT) {
+            tankLeft = leftControllerInput;
+            tankRight = leftControllerInput;
+            if (!(Robot.oi.driverController.getRawButton(10))) {
+                System.out.println("STATE_DIRECT_DRIVE->STATE_RAMP_DOWN");
+                driveState = DriveStates.STATE_RAMP_DOWN;
             }
             
         } else {
